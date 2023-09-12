@@ -3,7 +3,9 @@ package com.example.demo.services.implementation;
 import com.example.demo.dto.WorkerGetDTO;
 import com.example.demo.dto.WorkerPostDTO;
 import com.example.demo.entities.Worker;
-import com.example.demo.repositories.PayrollRepository;
+import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
+import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
+import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,64 +13,62 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class WorkerServiceImp implements WorkerService {
     @Autowired
     private WorkerRepository workerRepository;
-    @Autowired
-    private PayrollRepository payrollRepository;
 
     //region PUBLIC_METHODS
     @Override
-    public WorkerPostDTO saveWorker(Worker worker) {
+    public WorkerPostDTO saveWorker(Worker worker) throws WorkerConflictException, WorkerBadRequestException {
         Worker workerDb = getWorker(worker.getDni());
-        if (workerDb != null) return null;
+        if (workerDb != null) throw new WorkerConflictException();
+
+        String dni = worker.getDni();
+        if (dni.length() != 8 || Character.isLetter(dni.charAt(dni.length() - 1)))
+            throw new WorkerBadRequestException();
         String name = worker.getName();
-        if (name.isEmpty() || name.isBlank()) return null;
-        worker.setBalance(0.0);
-        worker.setPayrolls(new ArrayList<>());
-        worker.setTransfersReceived(new ArrayList<>());
-        worker.setTransfersEmitted(new ArrayList<>());
-        return new WorkerPostDTO(workerRepository.save(worker));
+        if (name.isEmpty() || name.isBlank())
+            throw new WorkerBadRequestException();
+
+        workerDb = Worker.builder().balance(0.0).
+                payrolls(new ArrayList<>()).
+                transfersEmitted(new ArrayList<>()).
+                transfersReceived(new ArrayList<>()).
+                salary(worker.getSalary()).build();
+
+        return new WorkerPostDTO(workerRepository.save(workerDb));
     }
 
     @Override
-    public WorkerPostDTO deleteWorker(String id) {
+    public void deleteWorker(String id) {
         Worker fromDB = getWorker(id);
-        if (fromDB != null) {
-            workerRepository.delete(fromDB);
-            return new WorkerPostDTO(fromDB);
-        }
-        return null;
+        if (fromDB == null) return;
+        workerRepository.delete(fromDB);
     }
 
     @Override
-    public WorkerPostDTO riseSalary(String id, double amount) {
+    public WorkerPostDTO riseSalary(String id, double amount) throws WorkerNotFoundException, WorkerBadRequestException {
         Worker fromDB = getWorker(id);
-        if (fromDB != null) {
-            fromDB.setSalary(fromDB.getSalary() + amount);
-            workerRepository.save(fromDB);
-            return new WorkerPostDTO(fromDB);
-        }
-        return null;
+        if (fromDB == null) throw new WorkerNotFoundException();
+        if (amount < 0) throw new WorkerBadRequestException();
+        fromDB.setSalary(fromDB.getSalary() + amount);
+        workerRepository.save(fromDB);
+        return new WorkerPostDTO(fromDB);
     }
 
     @Override
-    public WorkerGetDTO workerInformation(String id) {
-        return new WorkerGetDTO(getWorker(id));
+    public WorkerGetDTO workerInformation(String id) throws WorkerNotFoundException {
+        Worker result = getWorker(id);
+        if (result == null) throw new WorkerNotFoundException();
+        return new WorkerGetDTO(result);
     }
 
     public List<WorkerGetDTO> getAllWorkers(String pass) {
         if (!pass.equals("É0wyn")) return null;
-
-        List<WorkerGetDTO> result = new ArrayList<>();
-        List<Worker> workerList = workerRepository.findAll();
-
-        for (Worker w : workerList)
-            result.add(new WorkerGetDTO(w));
-
-        return result;
+        return workerRepository.findAll().stream().map(WorkerGetDTO::new).collect(Collectors.toList());
     }
     //endregion
 

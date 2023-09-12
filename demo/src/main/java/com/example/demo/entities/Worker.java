@@ -5,16 +5,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class Worker {
     @Id
     private String dni;
@@ -23,6 +22,7 @@ public class Worker {
     @Column(name = "lastName")
     private String lastName;
     @Column(name = "salary")
+    @Setter
     private double salary;
     @Column(name = "balance")
     @JsonIgnore
