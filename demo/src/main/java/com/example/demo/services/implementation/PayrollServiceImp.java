@@ -1,0 +1,56 @@
+package com.example.demo.services.implementation;
+
+import com.example.demo.dto.PayrollDTO;
+import com.example.demo.dto.PayrollPostDTO;
+import com.example.demo.entities.Payroll;
+import com.example.demo.entities.Worker;
+import com.example.demo.repositories.PayrollRepository;
+import com.example.demo.repositories.WorkerRepository;
+import com.example.demo.services.interfaces.PayrollService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class PayrollServiceImp implements PayrollService {
+    @Autowired
+    private WorkerRepository workerRepository;
+    @Autowired
+    private PayrollRepository payrollRepository;
+    private static final String KEYPASS = "Gandalf";
+
+    @Override
+    public List<PayrollDTO> getAll() {
+        List<Payroll> payrollList = payrollRepository.findAll();
+        if (payrollList.isEmpty()) return new ArrayList<>();
+        List<PayrollDTO> result = new ArrayList<>();
+        for (Payroll p : payrollList) {
+            result.add(new PayrollDTO(p));
+        }
+        return result;
+    }
+
+    @Override
+    public PayrollPostDTO pay(String id, String keyPass) throws Exception {
+        if (!(KEYPASS).equals(keyPass)) throw new Exception();
+        Worker worker = workerRepository.findById(id).orElse(null);
+        if (worker == null) return null;
+
+        double amountWithTaxes = worker.getSalary() - (worker.getSalary() * 0.0525);
+        worker.setBalance(amountWithTaxes);
+
+        Payroll payroll = new Payroll();
+        payroll.setAmount(amountWithTaxes);
+        payroll.setDate(Instant.now().toString());
+        payroll.setWorker(worker);
+
+        worker.getPayrolls().add(payroll);
+        payrollRepository.save(payroll);
+        workerRepository.save(worker);
+        return new PayrollPostDTO(payroll);
+    }
+
+}
