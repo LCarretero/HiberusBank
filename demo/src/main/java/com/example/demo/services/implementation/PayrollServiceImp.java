@@ -4,11 +4,14 @@ import com.example.demo.dto.PayrollDTO;
 import com.example.demo.dto.PayrollPostDTO;
 import com.example.demo.entities.Payroll;
 import com.example.demo.entities.Worker;
+import com.example.demo.exceptions.hiberusBankExcpetions.hiberusBankException;
+import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.repositories.PayrollRepository;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.PayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -34,10 +37,11 @@ public class PayrollServiceImp implements PayrollService {
     }
 
     @Override
+    @Transactional
     public PayrollPostDTO pay(String id, String keyPass) throws Exception {
-        if (!(KEYPASS).equals(keyPass)) throw new Exception();
+        if (!KEYPASS.equals(keyPass)) throw new hiberusBankException();
         Worker worker = workerRepository.findById(id).orElse(null);
-        if (worker == null) return null;
+        if (worker == null) throw new WorkerNotFoundException();
 
         double amountWithTaxes = worker.getSalary() - (worker.getSalary() * 0.0525);
         worker.setBalance(amountWithTaxes);

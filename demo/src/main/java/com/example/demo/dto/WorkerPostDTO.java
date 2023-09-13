@@ -3,12 +3,12 @@ package com.example.demo.dto;
 import com.example.demo.entities.Payroll;
 import com.example.demo.entities.Transfer;
 import com.example.demo.entities.Worker;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Getter
 @Setter
 public class WorkerPostDTO {

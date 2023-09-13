@@ -6,6 +6,7 @@ import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
+import com.example.demo.exceptions.workerExceptions.WorkerUnauthorizedException;
 
 import java.util.List;
 
@@ -14,6 +15,6 @@ public interface WorkerService {
     void deleteWorker(String id);
     WorkerPostDTO riseSalary(String workerDNI, double amount) throws WorkerNotFoundException, WorkerBadRequestException;
     WorkerGetDTO workerInformation(String id) throws WorkerNotFoundException;
-    List<WorkerGetDTO> getAllWorkers(String pass);
+    List<WorkerGetDTO> getAllWorkers(String pass) throws WorkerUnauthorizedException;
 
 }

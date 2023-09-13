@@ -6,9 +6,11 @@ import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
+import com.example.demo.exceptions.workerExceptions.WorkerUnauthorizedException;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class WorkerServiceImp implements WorkerService {
     @Autowired
     private WorkerRepository workerRepository;
+    private static final String PASSWORD = "É0wyn";
 
     //region PUBLIC_METHODS
     @Override
@@ -27,19 +30,19 @@ public class WorkerServiceImp implements WorkerService {
         if (workerDb != null) throw new WorkerConflictException();
 
         String dni = worker.getDni();
-        if (dni.length() != 8 || Character.isLetter(dni.charAt(dni.length() - 1)))
+        if (dni.length() != 9 || !Character.isLetter(dni.charAt(dni.length() - 1)))
             throw new WorkerBadRequestException();
         String name = worker.getName();
         if (name.isEmpty() || name.isBlank())
             throw new WorkerBadRequestException();
 
-        workerDb = Worker.builder().balance(0.0).
-                payrolls(new ArrayList<>()).
-                transfersEmitted(new ArrayList<>()).
-                transfersReceived(new ArrayList<>()).
+        Worker workerForDb = Worker.builder().balance(0.0).
+                dni(worker.getDni()).
+                name(worker.getName()).
+                lastName(worker.getLastName()).
                 salary(worker.getSalary()).build();
 
-        return new WorkerPostDTO(workerRepository.save(workerDb));
+        return new WorkerPostDTO(workerRepository.save(workerForDb));
     }
 
     @Override
@@ -66,8 +69,8 @@ public class WorkerServiceImp implements WorkerService {
         return new WorkerGetDTO(result);
     }
 
-    public List<WorkerGetDTO> getAllWorkers(String pass) {
-        if (!pass.equals("É0wyn")) return null;
+    public List<WorkerGetDTO> getAllWorkers(String pass) throws WorkerUnauthorizedException {
+        if (!PASSWORD.equals(pass)) throw new WorkerUnauthorizedException();
         return workerRepository.findAll().stream().map(WorkerGetDTO::new).collect(Collectors.toList());
     }
     //endregion

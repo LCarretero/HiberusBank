@@ -6,6 +6,7 @@ import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
+import com.example.demo.exceptions.workerExceptions.WorkerUnauthorizedException;
 import com.example.demo.services.implementation.WorkerServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,13 +32,16 @@ public class WorkerController {
 
     @GetMapping("/all")
     public ResponseEntity<List<WorkerGetDTO>> getAllWorkers(@RequestHeader(value = "Authorization") String pass) {
-        List<WorkerGetDTO> result = workerService.getAllWorkers(pass);
-        if (result == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok(result);
+        try {
+            List<WorkerGetDTO> result = workerService.getAllWorkers(pass);
+            return ResponseEntity.ok(result);
+        } catch (WorkerUnauthorizedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @PostMapping()
-    public ResponseEntity<WorkerPostDTO> postWorker(@RequestBody Worker worker) throws WorkerConflictException {
+    public ResponseEntity<WorkerPostDTO> postWorker(@RequestBody Worker worker) {
         try {
             WorkerPostDTO result = workerService.saveWorker(worker);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);

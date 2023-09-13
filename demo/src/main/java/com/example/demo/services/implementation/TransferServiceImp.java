@@ -4,11 +4,15 @@ import com.example.demo.dto.TransferCreateDTO;
 import com.example.demo.dto.TransferPostDTO;
 import com.example.demo.entities.Transfer;
 import com.example.demo.entities.Worker;
+import com.example.demo.exceptions.transferExceptions.TransferBadFormatException;
+import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.repositories.TransferRepository;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,18 +25,19 @@ public class TransferServiceImp implements TransferService {
 
     @Autowired
     private WorkerRepository workerRepository;
-
-    private static final String BANNED = "Antonio";
+    @Value(value = "banned")
+    private static String banned;
 
     @Override
-    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws IllegalAccessException, IllegalStateException {
-        if (transfer.getAmount() % 10 != 0) throw new IllegalAccessException();
+    @Transactional
+    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws IllegalStateException, TransferBadFormatException, WorkerNotFoundException {
+        if (transfer.getAmount() % 10 != 0) throw new TransferBadFormatException();
         Worker sourceWorker = workerRepository.findById(transfer.getSourceDNI()).orElse(null);
-        if (sourceWorker == null) return null;
+        if (sourceWorker == null) throw new WorkerNotFoundException();
         Worker destinyWorker = workerRepository.findById(transfer.getDestinyDNI()).orElse(null);
-        if (destinyWorker == null) return null;
-        if (sourceWorker.getName().equals("Antonio") || destinyWorker.getName().equals("Antonio"))
-            throw new IllegalStateException();
+        if (destinyWorker == null) throw new WorkerNotFoundException();
+        if (sourceWorker.getName().equals(banned) || destinyWorker.getName().equals(banned))
+            throw new TransferBadFormatException();
         double amount = transfer.getAmount();
         Transfer transferToDB = new Transfer(sourceWorker, destinyWorker, amount);
 

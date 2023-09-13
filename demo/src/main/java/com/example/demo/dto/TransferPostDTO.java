@@ -4,8 +4,6 @@ import com.example.demo.entities.Transfer;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 public class TransferPostDTO {
 
     private WorkerPostDTO source;
