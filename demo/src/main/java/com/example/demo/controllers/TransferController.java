@@ -2,9 +2,10 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.TransferCreateDTO;
 import com.example.demo.dto.TransferPostDTO;
+import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
+import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,19 +18,18 @@ public class TransferController {
     private TransferService transferService;
 
     @PostMapping()
-    public ResponseEntity<TransferPostDTO> pay(@RequestBody TransferCreateDTO transfer) throws IllegalAccessException,IllegalStateException   {
+    public ResponseEntity<TransferPostDTO> pay(@RequestBody TransferCreateDTO transfer){
         try {
             TransferPostDTO result = transferService.makeTransfer(transfer);
             if (result == null) return ResponseEntity.badRequest().build();
             return ResponseEntity.ok(result);
-
+        } catch (WorkerNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (TransferBadRequestException e) {
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
-            if (e.getClass().equals(IllegalStateException.class))
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            if (e.getClass().equals(IllegalAccessException.class))
-                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @GetMapping()

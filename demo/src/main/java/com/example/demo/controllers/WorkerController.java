@@ -3,6 +3,7 @@ package com.example.demo.controllers;
 import com.example.demo.dto.WorkerGetDTO;
 import com.example.demo.dto.WorkerPostDTO;
 import com.example.demo.entities.Worker;
+import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
@@ -58,13 +59,12 @@ public class WorkerController {
             return ResponseEntity.ok(workerService.riseSalary(id, Double.parseDouble(amount)));
         } catch (WorkerNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (WorkerBadRequestException e) {
-            return ResponseEntity.badRequest().build();
+        } catch (TransferBadRequestException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWorker(@PathVariable(name = "id") String id) {
         workerService.deleteWorker(id);
     }

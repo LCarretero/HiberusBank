@@ -10,6 +10,7 @@ import org.aspectj.weaver.patterns.ThisOrTargetPointcut;
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
 
+@Getter
 public class PayrollDTO {
 
     private String date;

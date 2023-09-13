@@ -4,6 +4,7 @@ import com.example.demo.entities.Payroll;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
 public class PayrollPostDTO {
     private String date;
     private Double amount;

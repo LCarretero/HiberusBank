@@ -2,14 +2,13 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.PayrollDTO;
 import com.example.demo.dto.PayrollPostDTO;
-import com.example.demo.entities.Payroll;
+import com.example.demo.exceptions.hiberusBankExcpetions.hiberusBankException;
+import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.PayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,8 +23,10 @@ public class PayrollController {
             PayrollPostDTO result = payrollService.pay(id, keyPass);
             if (result == null) return ResponseEntity.notFound().build();
             return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (WorkerNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (hiberusBankException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

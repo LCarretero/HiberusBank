@@ -4,7 +4,7 @@ import com.example.demo.dto.TransferCreateDTO;
 import com.example.demo.dto.TransferPostDTO;
 import com.example.demo.entities.Transfer;
 import com.example.demo.entities.Worker;
-import com.example.demo.exceptions.transferExceptions.TransferBadFormatException;
+import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.repositories.TransferRepository;
 import com.example.demo.repositories.WorkerRepository;
@@ -30,14 +30,14 @@ public class TransferServiceImp implements TransferService {
 
     @Override
     @Transactional
-    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws IllegalStateException, TransferBadFormatException, WorkerNotFoundException {
-        if (transfer.getAmount() % 10 != 0) throw new TransferBadFormatException();
+    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws TransferBadRequestException, WorkerNotFoundException {
+        if (transfer.getAmount() % 10 != 0) throw new TransferBadRequestException("The amount must be a multiple of 10");
         Worker sourceWorker = workerRepository.findById(transfer.getSourceDNI()).orElse(null);
-        if (sourceWorker == null) throw new WorkerNotFoundException();
+        if (sourceWorker == null) throw new WorkerNotFoundException("The source worker is not valid");
         Worker destinyWorker = workerRepository.findById(transfer.getDestinyDNI()).orElse(null);
-        if (destinyWorker == null) throw new WorkerNotFoundException();
+        if (destinyWorker == null) throw new WorkerNotFoundException("The destiny worker is not valid");
         if (sourceWorker.getName().equals(banned) || destinyWorker.getName().equals(banned))
-            throw new TransferBadFormatException();
+            throw new TransferBadRequestException("Antonio is not allowed in our system");
         double amount = transfer.getAmount();
         Transfer transferToDB = new Transfer(sourceWorker, destinyWorker, amount);
 

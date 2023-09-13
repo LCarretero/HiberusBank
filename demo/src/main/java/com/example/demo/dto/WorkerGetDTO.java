@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 public class WorkerGetDTO {
 
     private String name;

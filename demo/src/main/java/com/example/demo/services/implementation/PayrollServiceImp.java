@@ -38,10 +38,10 @@ public class PayrollServiceImp implements PayrollService {
 
     @Override
     @Transactional
-    public PayrollPostDTO pay(String id, String keyPass) throws Exception {
+    public PayrollPostDTO pay(String id, String keyPass) throws hiberusBankException,WorkerNotFoundException {
         if (!KEYPASS.equals(keyPass)) throw new hiberusBankException();
         Worker worker = workerRepository.findById(id).orElse(null);
-        if (worker == null) throw new WorkerNotFoundException();
+        if (worker == null) throw new WorkerNotFoundException("The worker does not exist");
 
         double amountWithTaxes = worker.getSalary() - (worker.getSalary() * 0.0525);
         worker.setBalance(amountWithTaxes);
