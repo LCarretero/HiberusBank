@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Table(name = "worker")
 public class Worker {
     @Id
     private String dni;

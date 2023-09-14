@@ -1,0 +1,16 @@
+server:
+  servlet:
+    context-path: /bank
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgresBank
+    username: hiberusBank
+    password: Hiberus123
+    driverClassName: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgresPlusDialect
+    hibernate:
+      ddl-auto: create
+
+keypass: Gandalf

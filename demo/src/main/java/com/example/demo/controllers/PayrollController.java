@@ -21,7 +21,6 @@ public class PayrollController {
     public ResponseEntity<PayrollPostDTO> payWorker(@RequestHeader(value = "Authorization") String keyPass, @PathVariable String id) {
         try {
             PayrollPostDTO result = payrollService.pay(id, keyPass);
-            if (result == null) return ResponseEntity.notFound().build();
             return ResponseEntity.ok(result);
         } catch (WorkerNotFoundException e) {
             return ResponseEntity.notFound().build();

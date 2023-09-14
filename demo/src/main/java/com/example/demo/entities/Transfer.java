@@ -1,12 +1,17 @@
 package com.example.demo.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "transfer")
 public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

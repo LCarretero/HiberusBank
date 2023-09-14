@@ -10,6 +10,7 @@ import com.example.demo.repositories.PayrollRepository;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.PayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,8 @@ public class PayrollServiceImp implements PayrollService {
     private WorkerRepository workerRepository;
     @Autowired
     private PayrollRepository payrollRepository;
-    private static final String KEYPASS = "Gandalf";
+    @Value( value = "${keypass}")
+    private static String KEYPASS;
 
     @Override
     public List<PayrollDTO> getAll() {

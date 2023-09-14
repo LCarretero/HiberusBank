@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TransferServiceImp implements TransferService {
@@ -29,7 +30,8 @@ public class TransferServiceImp implements TransferService {
     @Override
     @Transactional
     public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws TransferBadRequestException, WorkerNotFoundException {
-        if (transfer.getAmount() % 10 != 0) throw new TransferBadRequestException("The amount must be a multiple of 10");
+        if (transfer.getAmount() % 10 != 0)
+            throw new TransferBadRequestException("The amount must be a multiple of 10");
         Worker sourceWorker = workerRepository.findById(transfer.getSourceDNI()).orElse(null);
         if (sourceWorker == null) throw new WorkerNotFoundException("The source worker is not valid");
         Worker destinyWorker = workerRepository.findById(transfer.getDestinyDNI()).orElse(null);
@@ -61,9 +63,8 @@ public class TransferServiceImp implements TransferService {
     @Override
     public List<TransferPostDTO> getAll() {
         List<Transfer> transferList = transferRepository.findAll();
-        if (transferList.isEmpty()) return null;
-
         List<TransferPostDTO> result = new ArrayList<>();
+        if (transferList.isEmpty()) return result;
 
         for (Transfer tr : transferList)
             result.add(new TransferPostDTO(tr));
@@ -73,15 +74,14 @@ public class TransferServiceImp implements TransferService {
 
     @Override
     public List<TransferPostDTO> failedTransfers() {
-        //Maybe a query for this
         List<Transfer> transferList = transferRepository.findAll();
-        if (transferList.isEmpty()) return null;
-
         List<TransferPostDTO> result = new ArrayList<>();
+        if (transferList.isEmpty()) return result;
 
-        for (Transfer tr : transferList) {
-            if (!tr.isValid()) result.add(new TransferPostDTO(tr));
-        }
+       result = transferList.stream().filter(transfer -> !transfer.isValid())
+               .map(TransferPostDTO::new)
+               .collect(Collectors.toList());
+
         return result;
     }
 }
