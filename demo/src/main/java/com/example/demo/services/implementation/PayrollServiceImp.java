@@ -25,7 +25,7 @@ public class PayrollServiceImp implements PayrollService {
     @Autowired
     private PayrollRepository payrollRepository;
     @Value( value = "${keypass}")
-    private static String KEYPASS;
+    private String KEYPASS;
 
     @Override
     public List<PayrollDTO> getAll() {

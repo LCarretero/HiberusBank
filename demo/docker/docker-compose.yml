@@ -6,8 +6,10 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ~/apps/postgres:/var/lib/postgresql/data
+      - ./docker:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=Hiberus123
       - POSTGRES_USER=hiberusBank
       - POSTGRES_DB=postgresBank
+volumes:
+  db-data:
