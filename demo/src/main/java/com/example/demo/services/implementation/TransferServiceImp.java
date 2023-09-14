@@ -19,10 +19,8 @@ import java.util.List;
 
 @Service
 public class TransferServiceImp implements TransferService {
-
     @Autowired
     private TransferRepository transferRepository;
-
     @Autowired
     private WorkerRepository workerRepository;
     @Value(value = "banned")
