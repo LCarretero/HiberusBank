@@ -2,7 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.dto.TransferCreateDTO;
 import com.example.demo.dto.TransferPostDTO;
-import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
+import com.example.demo.exceptions.transferExceptions.TransferUnauthorizedException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class TransferController {
             return ResponseEntity.ok(result);
         } catch (WorkerNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (TransferBadRequestException e) {
+        } catch (TransferUnauthorizedException e) {
             return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             throw new RuntimeException(e);

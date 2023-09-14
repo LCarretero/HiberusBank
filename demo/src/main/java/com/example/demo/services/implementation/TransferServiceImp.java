@@ -4,7 +4,7 @@ import com.example.demo.dto.TransferCreateDTO;
 import com.example.demo.dto.TransferPostDTO;
 import com.example.demo.entities.Transfer;
 import com.example.demo.entities.Worker;
-import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
+import com.example.demo.exceptions.transferExceptions.TransferUnauthorizedException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.repositories.TransferRepository;
 import com.example.demo.repositories.WorkerRepository;
@@ -29,20 +29,20 @@ public class TransferServiceImp implements TransferService {
 
     @Override
     @Transactional
-    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws TransferBadRequestException, WorkerNotFoundException {
-        if (transfer.getAmount() % 10 != 0)
-            throw new TransferBadRequestException("The amount must be a multiple of 10");
+    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws TransferUnauthorizedException, WorkerNotFoundException {
+        boolean valid = transfer.getAmount() % 10 == 0;
         Worker sourceWorker = workerRepository.findById(transfer.getSourceDNI()).orElse(null);
         if (sourceWorker == null) throw new WorkerNotFoundException("The source worker is not valid");
         Worker destinyWorker = workerRepository.findById(transfer.getDestinyDNI()).orElse(null);
         if (destinyWorker == null) throw new WorkerNotFoundException("The destiny worker is not valid");
         if (sourceWorker.getName().equals(banned) || destinyWorker.getName().equals(banned))
-            throw new TransferBadRequestException("Antonio is not allowed in our system");
+            throw new TransferUnauthorizedException("Antonio is not allowed in our system");
         double amount = transfer.getAmount();
         Transfer transferToDB = new Transfer(sourceWorker, destinyWorker, amount);
 
         double sourceBalance = sourceWorker.getBalance();
-        boolean valid = sourceBalance >= amount;
+        valid = valid && sourceBalance >= amount;
+
         transferToDB.setValid(valid);
         transferRepository.save(transferToDB);
 
@@ -50,7 +50,6 @@ public class TransferServiceImp implements TransferService {
             double destinyBalance = destinyWorker.getBalance();
             sourceWorker.setBalance(sourceBalance - amount);
             destinyWorker.setBalance(destinyBalance + amount);
-            transferToDB.setValid(true);
             sourceWorker.getTransfersEmitted().add(transferToDB);
             destinyWorker.getTransfersReceived().add(transferToDB);
             workerRepository.save(sourceWorker);
@@ -78,9 +77,7 @@ public class TransferServiceImp implements TransferService {
         List<TransferPostDTO> result = new ArrayList<>();
         if (transferList.isEmpty()) return result;
 
-       result = transferList.stream().filter(transfer -> !transfer.isValid())
-               .map(TransferPostDTO::new)
-               .collect(Collectors.toList());
+        result = transferList.stream().filter(transfer -> !transfer.isValid()).map(TransferPostDTO::new).collect(Collectors.toList());
 
         return result;
     }
