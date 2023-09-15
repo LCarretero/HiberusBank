@@ -1,7 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.WorkerGetDTO;
-import com.example.demo.dto.WorkerPostDTO;
+import com.example.demo.dto.WorkerDTO;
 import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
@@ -23,7 +22,7 @@ public class WorkerController {
     private WorkerServiceImp workerService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<WorkerGetDTO> getWorker(@PathVariable(name = "id") String id) {
+    public ResponseEntity<WorkerDTO> getWorker(@PathVariable(name = "id") String id) {
         try {
             return ResponseEntity.ok(workerService.workerInformation(id));
         } catch (WorkerNotFoundException e) {
@@ -32,9 +31,9 @@ public class WorkerController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<WorkerGetDTO>> getAllWorkers(@RequestHeader(value = "Authorization") String pass) {
+    public ResponseEntity<List<WorkerDTO>> getAllWorkers(@RequestHeader(value = "Authorization") String pass) {
         try {
-            List<WorkerGetDTO> result = workerService.getAllWorkers(pass);
+            List<WorkerDTO> result = workerService.getAllWorkers(pass);
             return ResponseEntity.ok(result);
         } catch (WorkerUnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -42,9 +41,9 @@ public class WorkerController {
     }
 
     @PostMapping()
-    public ResponseEntity<WorkerPostDTO> postWorker(@RequestBody Worker worker) {
+    public ResponseEntity<WorkerDTO> postWorker(@RequestBody Worker worker) {
         try {
-            WorkerPostDTO result = workerService.saveWorker(worker);
+            WorkerDTO result = workerService.saveWorker(worker);
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (WorkerConflictException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -54,7 +53,7 @@ public class WorkerController {
     }
 
     @PutMapping("/rise/{id}")
-    public ResponseEntity<WorkerPostDTO> riseSalary(@PathVariable(name = "id") String id, @RequestParam(name = "amount") String amount) {
+    public ResponseEntity<WorkerDTO> riseSalary(@PathVariable(name = "id") String id, @RequestParam(name = "amount") String amount) {
         try {
             return ResponseEntity.ok(workerService.riseSalary(id, Double.parseDouble(amount)));
         } catch (WorkerNotFoundException e) {

@@ -1,13 +1,18 @@
 package com.example.demo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -26,12 +31,10 @@ public class Worker {
     @JsonIgnore
     @Setter
     private double balance = 0.0;
-
-    //podria ser una lista de ids
-    @OneToMany(mappedBy = "source", cascade = CascadeType.REMOVE)
-    private List<Transfer> transfersEmitted;
-    @OneToMany(mappedBy = "destiny", cascade = CascadeType.REMOVE)
-    private List<Transfer> transfersReceived;
-    @OneToMany(mappedBy = "worker")
-    private List<Payroll> payrolls;
+    @Column(name = "emitted")
+    private List<Long> transfersEmitted;
+    @Column(name = "received")
+    private List<Long> transfersReceived;
+    @Column(name = "payrolls")
+    private List<Long> payrolls;
 }

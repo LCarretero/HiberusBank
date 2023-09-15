@@ -1,14 +1,19 @@
 package com.example.demo.services.implementation;
 
-import com.example.demo.dto.WorkerGetDTO;
-import com.example.demo.dto.WorkerPostDTO;
+import com.example.demo.dto.TransferDTO;
+import com.example.demo.dto.WorkerDTO;
+import com.example.demo.entities.Transfer;
 import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.transferExceptions.TransferBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerBadRequestException;
 import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.exceptions.workerExceptions.WorkerUnauthorizedException;
+import com.example.demo.mapper.WorkerMapper;
+import com.example.demo.repositories.PayrollRepository;
+import com.example.demo.repositories.TransferRepository;
 import com.example.demo.repositories.WorkerRepository;
+import com.example.demo.services.interfaces.TransferService;
 import com.example.demo.services.interfaces.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,13 +23,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class WorkerServiceImp implements WorkerService {
+    private static final String PASSWORD = "É0wyn";
     @Autowired
     private WorkerRepository workerRepository;
-    private static final String PASSWORD = "É0wyn";
+    private TransferRepository transferRepository;
+    private PayrollRepository payrollRepository;
 
     //region PUBLIC_METHODS
     @Override
-    public WorkerPostDTO saveWorker(Worker worker) throws WorkerConflictException, WorkerBadRequestException {
+    public WorkerDTO saveWorker(Worker worker) throws WorkerConflictException, WorkerBadRequestException {
         Worker workerDb = getWorker(worker.getDni());
         if (workerDb != null) throw new WorkerConflictException("The worker already exist");
 
@@ -35,13 +42,7 @@ public class WorkerServiceImp implements WorkerService {
         if (name.isEmpty() || name.isBlank())
             throw new WorkerBadRequestException("The name is not correct");
 
-        Worker workerForDb = Worker.builder().balance(0.0).
-                dni(worker.getDni()).
-                name(worker.getName()).
-                lastName(worker.getLastName()).
-                salary(worker.getSalary()).build();
-
-        return new WorkerPostDTO(workerRepository.save(workerForDb));
+        return WorkerMapper.INSTANCE.modelToDTO(workerRepository.save(worker));
     }
 
     @Override
@@ -52,25 +53,26 @@ public class WorkerServiceImp implements WorkerService {
     }
 
     @Override
-    public WorkerPostDTO riseSalary(String id, double amount) throws WorkerNotFoundException, TransferBadRequestException {
+    public WorkerDTO riseSalary(String id, double amount) throws WorkerNotFoundException, TransferBadRequestException {
         Worker fromDB = getWorker(id);
         if (fromDB == null) throw new WorkerNotFoundException("The worker is not found");
         if (amount < 0) throw new TransferBadRequestException("The amount must be a valid number");
         fromDB.setSalary(fromDB.getSalary() + amount);
         workerRepository.save(fromDB);
-        return new WorkerPostDTO(fromDB);
+        return WorkerMapper.INSTANCE.modelToDTO(fromDB);
     }
 
     @Override
-    public WorkerGetDTO workerInformation(String id) throws WorkerNotFoundException {
+    public WorkerDTO workerInformation(String id) throws WorkerNotFoundException {
         Worker result = getWorker(id);
         if (result == null) throw new WorkerNotFoundException("The provided worker does not exist");
-        return new WorkerGetDTO(result);
+        List<TransferDTO> a = transferRepository.getReferenceById()
+        return WorkerMapper.INSTANCE.modelToDTO(result);
     }
 
-    public List<WorkerGetDTO> getAllWorkers(String pass) throws WorkerUnauthorizedException {
+    public List<WorkerDTO> getAllWorkers(String pass) throws WorkerUnauthorizedException {
         if (!PASSWORD.equals(pass)) throw new WorkerUnauthorizedException("Unauthorized");
-        return workerRepository.findAll().stream().map(WorkerGetDTO::new).collect(Collectors.toList());
+        return workerRepository.findAll().stream().map(WorkerMapper.INSTANCE::modelToDTO).collect(Collectors.toList());
     }
     //endregion
 

@@ -20,6 +20,8 @@ public class Payroll {
     private String date;
     @Column(name = "amount")
     private double amount;
+    @Column(name = "worker")
+    private String worker;
 
     @Override
     public String toString() {
@@ -27,11 +29,7 @@ public class Payroll {
                 "id = " + id +
                 ", date = " + date + '\'' +
                 ", amount = " + amount +
-                ", worker name = " + worker.getName() +
+                ", worker name = " + worker +
                 '}';
     }
-
-    @ManyToOne
-    @JoinColumn(name = "payrolls")
-    private Worker worker;
 }

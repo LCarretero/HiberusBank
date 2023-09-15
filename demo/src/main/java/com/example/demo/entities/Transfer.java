@@ -17,21 +17,19 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
     @JoinColumn(name = "source", referencedColumnName = "dni")
-    private Worker source;
+    private String source;
 
-    @ManyToOne
     @JoinColumn(name = "destiny", referencedColumnName = "dni")
-    private Worker destiny;
+    private String destiny;
 
     private double amount;
     @Column(name = "valid", columnDefinition = "boolean default true")
     private boolean valid;
 
     public Transfer(Worker sourceWorker, Worker destinyWorker, double amount) {
-        this.source = sourceWorker;
-        this.destiny = destinyWorker;
+        this.source = sourceWorker.getDni();
+        this.destiny = destinyWorker.getDni();
         this.amount = amount;
     }
 
@@ -39,8 +37,8 @@ public class Transfer {
     public String toString() {
         return "Transfer{" +
                 "id = " + id +
-                ", source name = " + source.getName() +
-                ", destiny name = " + destiny.getName() +
+                ", source name = " + source +
+                ", destiny name = " + destiny +
                 ", amount = " + amount +
                 ", valid = " + valid +
                 '}';

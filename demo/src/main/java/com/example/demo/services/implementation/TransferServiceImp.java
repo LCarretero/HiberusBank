@@ -1,11 +1,11 @@
 package com.example.demo.services.implementation;
 
-import com.example.demo.dto.TransferCreateDTO;
-import com.example.demo.dto.TransferPostDTO;
+import com.example.demo.dto.TransferDTO;
 import com.example.demo.entities.Transfer;
 import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.transferExceptions.TransferUnauthorizedException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
+import com.example.demo.mapper.TransferMapper;
 import com.example.demo.repositories.TransferRepository;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.TransferService;
@@ -20,24 +20,24 @@ import java.util.stream.Collectors;
 
 @Service
 public class TransferServiceImp implements TransferService {
+    @Value(value = "banned")
+    private static String banned;
     @Autowired
     private TransferRepository transferRepository;
     @Autowired
     private WorkerRepository workerRepository;
-    @Value(value = "banned")
-    private static String banned;
 
     @Override
     @Transactional
-    public TransferPostDTO makeTransfer(TransferCreateDTO transfer) throws TransferUnauthorizedException, WorkerNotFoundException {
-        boolean valid = transfer.getAmount() % 10 == 0;
-        Worker sourceWorker = workerRepository.findById(transfer.getSourceDNI()).orElse(null);
+    public TransferDTO makeTransfer(TransferDTO transfer) throws TransferUnauthorizedException, WorkerNotFoundException {
+        boolean valid = transfer.amount() % 10 == 0;
+        Worker sourceWorker = workerRepository.findById(transfer.source()).orElse(null);
         if (sourceWorker == null) throw new WorkerNotFoundException("The source worker is not valid");
-        Worker destinyWorker = workerRepository.findById(transfer.getDestinyDNI()).orElse(null);
+        Worker destinyWorker = workerRepository.findById(transfer.destiny()).orElse(null);
         if (destinyWorker == null) throw new WorkerNotFoundException("The destiny worker is not valid");
         if (sourceWorker.getName().equals(banned) || destinyWorker.getName().equals(banned))
             throw new TransferUnauthorizedException("Antonio is not allowed in our system");
-        double amount = transfer.getAmount();
+        double amount = transfer.amount();
         Transfer transferToDB = new Transfer(sourceWorker, destinyWorker, amount);
 
         double sourceBalance = sourceWorker.getBalance();
@@ -50,35 +50,27 @@ public class TransferServiceImp implements TransferService {
             double destinyBalance = destinyWorker.getBalance();
             sourceWorker.setBalance(sourceBalance - amount);
             destinyWorker.setBalance(destinyBalance + amount);
-            sourceWorker.getTransfersEmitted().add(transferToDB);
-            destinyWorker.getTransfersReceived().add(transferToDB);
+            sourceWorker.getTransfersEmitted().add(transferToDB.getSource());
+            destinyWorker.getTransfersReceived().add(transferToDB.getDestiny());
             workerRepository.save(sourceWorker);
             workerRepository.save(destinyWorker);
         }
 
-        return new TransferPostDTO(transferToDB);
+        return TransferMapper.INSTANCE.mapToDTO(transferToDB);
     }
 
     @Override
-    public List<TransferPostDTO> getAll() {
+    public List<TransferDTO> getAll() {
         List<Transfer> transferList = transferRepository.findAll();
-        List<TransferPostDTO> result = new ArrayList<>();
-        if (transferList.isEmpty()) return result;
-
-        for (Transfer tr : transferList)
-            result.add(new TransferPostDTO(tr));
-
-        return result;
+        return transferList.stream().map(TransferMapper.INSTANCE::mapToDTO).toList();
     }
 
     @Override
-    public List<TransferPostDTO> failedTransfers() {
+    public List<TransferDTO> failedTransfers() {
         List<Transfer> transferList = transferRepository.findAll();
-        List<TransferPostDTO> result = new ArrayList<>();
+        List<TransferDTO> result = new ArrayList<>();
         if (transferList.isEmpty()) return result;
 
-        result = transferList.stream().filter(transfer -> !transfer.isValid()).map(TransferPostDTO::new).collect(Collectors.toList());
-
-        return result;
+        return transferList.stream().filter(Transfer::isValid).map(TransferMapper.INSTANCE::mapToDTO).collect(Collectors.toList());
     }
 }

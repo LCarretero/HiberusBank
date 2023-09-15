@@ -1,11 +1,11 @@
 package com.example.demo.services.implementation;
 
 import com.example.demo.dto.PayrollDTO;
-import com.example.demo.dto.PayrollPostDTO;
 import com.example.demo.entities.Payroll;
 import com.example.demo.entities.Worker;
 import com.example.demo.exceptions.hiberusBankExcpetions.hiberusBankException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
+import com.example.demo.mapper.PayrollMapper;
 import com.example.demo.repositories.PayrollRepository;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.PayrollService;
@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PayrollServiceImp implements PayrollService {
@@ -31,14 +29,13 @@ public class PayrollServiceImp implements PayrollService {
     @Override
     public List<PayrollDTO> getAll() {
         List<Payroll> payrollList = payrollRepository.findAll();
-        if (payrollList.isEmpty()) return new ArrayList<>();
 
-        return payrollList.stream().map(PayrollDTO::new).collect(Collectors.toList());
+        return payrollList.stream().map(PayrollMapper.INSTANCE::mapToDTO).toList();
     }
 
     @Override
     @Transactional
-    public PayrollPostDTO pay(String id, String keyPass) throws hiberusBankException, WorkerNotFoundException {
+    public PayrollDTO pay(String id, String keyPass) throws hiberusBankException, WorkerNotFoundException {
         if (!KEYPASS.equals(keyPass)) throw new hiberusBankException();
         Worker worker = workerRepository.findById(id).orElse(null);
         if (worker == null) throw new WorkerNotFoundException("The worker does not exist");
@@ -49,12 +46,12 @@ public class PayrollServiceImp implements PayrollService {
         Payroll payroll = new Payroll();
         payroll.setAmount(amountWithTaxes);
         payroll.setDate(Instant.now().toString());
-        payroll.setWorker(worker);
+        payroll.setWorker(id);
 
-        worker.getPayrolls().add(payroll);
+        worker.getPayrolls().add(String.valueOf(payroll.getId()));
         payrollRepository.save(payroll);
         workerRepository.save(worker);
-        return new PayrollPostDTO(payroll);
+        return PayrollMapper.INSTANCE.mapToDTO(payroll);
     }
 
 }

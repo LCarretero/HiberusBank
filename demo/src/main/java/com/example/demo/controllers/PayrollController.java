@@ -1,7 +1,6 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.PayrollDTO;
-import com.example.demo.dto.PayrollPostDTO;
 import com.example.demo.exceptions.hiberusBankExcpetions.hiberusBankException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.PayrollService;
@@ -18,9 +17,9 @@ public class PayrollController {
     private PayrollService payrollService;
 
     @PostMapping("/{id}")
-    public ResponseEntity<PayrollPostDTO> payWorker(@RequestHeader(value = "Authorization") String keyPass, @PathVariable String id) {
+    public ResponseEntity<PayrollDTO> payWorker(@RequestHeader(value = "Authorization") String keyPass, @PathVariable String id) {
         try {
-            PayrollPostDTO result = payrollService.pay(id, keyPass);
+            PayrollDTO result = payrollService.pay(id, keyPass);
             return ResponseEntity.ok(result);
         } catch (WorkerNotFoundException e) {
             return ResponseEntity.notFound().build();

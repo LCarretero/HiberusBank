@@ -1,7 +1,6 @@
 package com.example.demo.controllers;
 
-import com.example.demo.dto.TransferCreateDTO;
-import com.example.demo.dto.TransferPostDTO;
+import com.example.demo.dto.TransferDTO;
 import com.example.demo.exceptions.transferExceptions.TransferUnauthorizedException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.TransferService;
@@ -18,11 +17,9 @@ public class TransferController {
     private TransferService transferService;
 
     @PostMapping()
-    public ResponseEntity<TransferPostDTO> pay(@RequestBody TransferCreateDTO transfer){
+    public ResponseEntity<TransferDTO> pay(@RequestBody TransferDTO transfer) {
         try {
-            TransferPostDTO result = transferService.makeTransfer(transfer);
-            if (result == null) return ResponseEntity.badRequest().build();
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(transferService.makeTransfer(transfer));
         } catch (WorkerNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (TransferUnauthorizedException e) {
@@ -33,12 +30,12 @@ public class TransferController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<TransferPostDTO>> getAll() {
+    public ResponseEntity<List<TransferDTO>> getAll() {
         return ResponseEntity.ok(transferService.getAll());
     }
 
     @GetMapping("/failed")
-    public ResponseEntity<List<TransferPostDTO>> failedTransfers() {
+    public ResponseEntity<List<TransferDTO>> failedTransfers() {
         return ResponseEntity.ok(transferService.failedTransfers());
     }
 }
