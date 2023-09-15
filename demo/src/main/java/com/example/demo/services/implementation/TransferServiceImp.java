@@ -14,12 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class TransferServiceImp implements TransferService {
+    //region PRIVATE_FIELDS
     @Value(value = "banned")
     private static String banned;
     @Autowired
@@ -27,6 +27,9 @@ public class TransferServiceImp implements TransferService {
     @Autowired
     private WorkerRepository workerRepository;
 
+    //endregion
+
+    //region PUBLIC_METHODS
     @Override
     @Transactional
     public TransferDTO makeTransfer(TransferDTO transfer) throws TransferUnauthorizedException, WorkerNotFoundException {
@@ -68,9 +71,7 @@ public class TransferServiceImp implements TransferService {
     @Override
     public List<TransferDTO> failedTransfers() {
         List<Transfer> transferList = transferRepository.findAll();
-        List<TransferDTO> result = new ArrayList<>();
-        if (transferList.isEmpty()) return result;
-
-        return transferList.stream().filter(Transfer::isValid).map(TransferMapper.INSTANCE::mapToDTO).collect(Collectors.toList());
+        return transferList.stream().filter(transfer -> !transfer.isValid()).map(TransferMapper.INSTANCE::mapToDTO).collect(Collectors.toList());
     }
+    //endregion
 }

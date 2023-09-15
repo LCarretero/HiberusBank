@@ -14,3 +14,4 @@ spring:
       ddl-auto: create
 
 keypass: Gandalf
+lore: É0wyn

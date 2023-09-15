@@ -1,10 +1,7 @@
 package com.example.demo.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,9 +29,12 @@ public class Worker {
     @Setter
     private double balance = 0.0;
     @Column(name = "emitted")
-    private List<Long> transfersEmitted;
+    @ElementCollection
+    private List<String> transfersEmitted;
     @Column(name = "received")
-    private List<Long> transfersReceived;
+    @ElementCollection
+    private List<String> transfersReceived;
     @Column(name = "payrolls")
-    private List<Long> payrolls;
+    @ElementCollection
+    private List<String> payrolls;
 }

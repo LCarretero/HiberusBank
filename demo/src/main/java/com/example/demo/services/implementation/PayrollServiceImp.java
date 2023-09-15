@@ -50,7 +50,6 @@ public class PayrollServiceImp implements PayrollService {
 
         worker.getPayrolls().add(String.valueOf(payroll.getId()));
         payrollRepository.save(payroll);
-        workerRepository.save(worker);
         return PayrollMapper.INSTANCE.mapToDTO(payroll);
     }
 
