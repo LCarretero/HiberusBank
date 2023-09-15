@@ -6,8 +6,8 @@ import lombok.Setter;
 
 @Getter
 public class PayrollPostDTO {
-    private String date;
-    private Double amount;
+    private final String date;
+    private final Double amount;
 
     public PayrollPostDTO(Payroll payroll) {
         this.date = payroll.getDate();

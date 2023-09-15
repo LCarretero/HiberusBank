@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 public class TransferPostDTO {
 
-    private WorkerPostDTO source;
-    private WorkerPostDTO destiny;
-    private double amount;
-    private boolean valid;
+    private final WorkerPostDTO source;
+    private final WorkerPostDTO destiny;
+    private final double amount;
+    private final boolean valid;
 
     public TransferPostDTO(Transfer transfer) {
         this.source = new WorkerPostDTO(transfer.getSource());

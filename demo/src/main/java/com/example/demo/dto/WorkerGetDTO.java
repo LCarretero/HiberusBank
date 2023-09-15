@@ -13,13 +13,13 @@ import java.util.List;
 @Getter
 public class WorkerGetDTO {
 
-    private String name;
-    private String lastName;
-    private double salary;
-    private double balance;
-    private List<TransferPostDTO> transfersEmitted;
-    private List<TransferPostDTO> transfersReceived;
-    private List<PayrollPostDTO> payrolls;
+    private final String name;
+    private final String lastName;
+    private final double salary;
+    private final double balance;
+    private final List<TransferPostDTO> transfersEmitted;
+    private final List<TransferPostDTO> transfersReceived;
+    private final List<PayrollPostDTO> payrolls;
 
     public WorkerGetDTO(Worker worker) {
         this.balance = worker.getBalance();

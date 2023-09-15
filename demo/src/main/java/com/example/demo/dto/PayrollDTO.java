@@ -13,9 +13,9 @@ import javax.persistence.OneToMany;
 @Getter
 public class PayrollDTO {
 
-    private String date;
-    private Double amount;
-    private WorkerPostDTO worker;
+    private final String date;
+    private final Double amount;
+    private final WorkerPostDTO worker;
 
     public PayrollDTO(Payroll payroll) {
         this.date = payroll.getDate();

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PayrollServiceImp implements PayrollService {
@@ -24,23 +25,20 @@ public class PayrollServiceImp implements PayrollService {
     private WorkerRepository workerRepository;
     @Autowired
     private PayrollRepository payrollRepository;
-    @Value( value = "${keypass}")
+    @Value(value = "${keypass}")
     private String KEYPASS;
 
     @Override
     public List<PayrollDTO> getAll() {
         List<Payroll> payrollList = payrollRepository.findAll();
         if (payrollList.isEmpty()) return new ArrayList<>();
-        List<PayrollDTO> result = new ArrayList<>();
-        for (Payroll p : payrollList) {
-            result.add(new PayrollDTO(p));
-        }
-        return result;
+
+        return payrollList.stream().map(PayrollDTO::new).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public PayrollPostDTO pay(String id, String keyPass) throws hiberusBankException,WorkerNotFoundException {
+    public PayrollPostDTO pay(String id, String keyPass) throws hiberusBankException, WorkerNotFoundException {
         if (!KEYPASS.equals(keyPass)) throw new hiberusBankException();
         Worker worker = workerRepository.findById(id).orElse(null);
         if (worker == null) throw new WorkerNotFoundException("The worker does not exist");
