@@ -47,18 +47,14 @@ public class TransferServiceImp implements TransferService {
         valid = valid && sourceBalance >= amount;
 
         transferToDB.setValid(valid);
+
         transferRepository.save(transferToDB);
 
         if (valid) {
-            double destinyBalance = destinyWorker.getBalance();
-            sourceWorker.setBalance(sourceBalance - amount);
-            destinyWorker.setBalance(destinyBalance + amount);
-            sourceWorker.getTransfersEmitted().add(transferToDB.getSource());
-            destinyWorker.getTransfersReceived().add(transferToDB.getDestiny());
-            workerRepository.save(sourceWorker);
-            workerRepository.save(destinyWorker);
+            sourceWorker.setBalance(sourceWorker.getBalance() - amount);
+            destinyWorker.setBalance(destinyWorker.getBalance() + amount);
         }
-
+        transfer(sourceWorker, destinyWorker, amount, transferToDB);
         return TransferMapper.INSTANCE.mapToDTO(transferToDB);
     }
 
@@ -72,6 +68,15 @@ public class TransferServiceImp implements TransferService {
     public List<TransferDTO> failedTransfers() {
         List<Transfer> transferList = transferRepository.findAll();
         return transferList.stream().filter(transfer -> !transfer.isValid()).map(TransferMapper.INSTANCE::mapToDTO).collect(Collectors.toList());
+    }
+    //endregion
+    
+    //region PRIVATE_METHOD
+    private void transfer(Worker sourceWorker, Worker destinyWorker, double amount, Transfer transfer) {
+       sourceWorker.getTransfersEmitted().add(transfer.getId());
+        destinyWorker.getTransfersReceived().add(transfer.getId());
+        workerRepository.save(sourceWorker);
+        workerRepository.save(destinyWorker);
     }
     //endregion
 }

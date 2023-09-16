@@ -30,11 +30,11 @@ public class Worker {
     private double balance = 0.0;
     @Column(name = "emitted")
     @ElementCollection
-    private List<String> transfersEmitted;
+    private List<Long> transfersEmitted;
     @Column(name = "received")
     @ElementCollection
-    private List<String> transfersReceived;
+    private List<Long> transfersReceived;
     @Column(name = "payrolls")
     @ElementCollection
-    private List<String> payrolls;
+    private List<Long> payrolls;
 }

@@ -1,7 +1,7 @@
-package com.example.demo.exceptions.hiberusBankExcpetions;
+package com.example.demo.exceptions.HiberusBankExcpetions;
 
-public class hiberusBankException extends Exception{
-    public hiberusBankException() {
+public class HiberusBankException extends Exception{
+    public HiberusBankException() {
         super();
     }
 }

@@ -1,7 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.PayrollDTO;
-import com.example.demo.exceptions.hiberusBankExcpetions.hiberusBankException;
+import com.example.demo.exceptions.HiberusBankExcpetions.HiberusBankException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.PayrollService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public class PayrollController {
             return ResponseEntity.ok(result);
         } catch (WorkerNotFoundException e) {
             return ResponseEntity.notFound().build();
-        } catch (hiberusBankException e) {
+        } catch (HiberusBankException e) {
             return ResponseEntity.badRequest().build();
         }
     }
