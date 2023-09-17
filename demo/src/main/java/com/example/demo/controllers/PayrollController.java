@@ -1,7 +1,7 @@
 package com.example.demo.controllers;
 
 import com.example.demo.dto.PayrollDTO;
-import com.example.demo.exceptions.HiberusBankExcpetions.HiberusBankException;
+import com.example.demo.exceptions.HiberusBankException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.services.interfaces.PayrollService;
 import org.springframework.beans.factory.annotation.Autowired;

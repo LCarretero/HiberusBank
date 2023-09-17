@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -16,6 +17,10 @@ import java.util.List;
 @Table(name = "worker")
 public class Worker {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @JsonIgnore
+    private UUID id;
+    @Column(name = "dni")
     private String dni;
     @Column(name = "name")
     private String name;
@@ -30,11 +35,14 @@ public class Worker {
     private double balance = 0.0;
     @Column(name = "emitted")
     @ElementCollection
+    @JsonIgnore
     private List<Long> transfersEmitted;
     @Column(name = "received")
     @ElementCollection
+    @JsonIgnore
     private List<Long> transfersReceived;
     @Column(name = "payrolls")
+    @JsonIgnore
     @ElementCollection
     private List<Long> payrolls;
 }

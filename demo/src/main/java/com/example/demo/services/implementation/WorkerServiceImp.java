@@ -8,8 +8,6 @@ import com.example.demo.exceptions.workerExceptions.WorkerConflictException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.exceptions.workerExceptions.WorkerUnauthorizedException;
 import com.example.demo.mapper.WorkerMapper;
-import com.example.demo.repositories.PayrollRepository;
-import com.example.demo.repositories.TransferRepository;
 import com.example.demo.repositories.WorkerRepository;
 import com.example.demo.services.interfaces.WorkerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +24,6 @@ public class WorkerServiceImp implements WorkerService {
     private String LORE;
     @Autowired
     private WorkerRepository workerRepository;
-    private TransferRepository transferRepository;
-    private PayrollRepository payrollRepository;
-
     //endregion
 
     //region PUBLIC_METHODS
@@ -79,7 +74,7 @@ public class WorkerServiceImp implements WorkerService {
 
     //region PRIVATE_METHODS
     private Worker getWorker(String id) {
-        return workerRepository.findById(id).orElse(null);
+        return workerRepository.findByDni(id);
     }
     //endregion
 }

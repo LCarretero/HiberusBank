@@ -3,7 +3,7 @@ package com.example.demo.services.implementation;
 import com.example.demo.dto.PayrollDTO;
 import com.example.demo.entities.Payroll;
 import com.example.demo.entities.Worker;
-import com.example.demo.exceptions.HiberusBankExcpetions.HiberusBankException;
+import com.example.demo.exceptions.HiberusBankException;
 import com.example.demo.exceptions.workerExceptions.WorkerNotFoundException;
 import com.example.demo.mapper.PayrollMapper;
 import com.example.demo.repositories.PayrollRepository;
@@ -36,7 +36,7 @@ public class PayrollServiceImp implements PayrollService {
     @Transactional
     public PayrollDTO pay(String id, String keyPass) throws HiberusBankException, WorkerNotFoundException {
         if (!KEYPASS.equals(keyPass)) throw new HiberusBankException();
-        Worker worker = workerRepository.findById(id).orElse(null);
+        Worker worker = workerRepository.findByDni(id);
         if (worker == null) throw new WorkerNotFoundException("The worker does not exist");
 
         double amountWithTaxes = worker.getSalary() - (worker.getSalary() * 0.0525);

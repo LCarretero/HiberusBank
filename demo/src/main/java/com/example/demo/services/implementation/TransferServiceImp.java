@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @Service
 public class TransferServiceImp implements TransferService {
     //region PRIVATE_FIELDS
-    @Value(value = "banned")
-    private static String banned;
+    @Value(value = "${banned}")
+    private String banned;
     @Autowired
     private TransferRepository transferRepository;
     @Autowired
@@ -34,12 +34,12 @@ public class TransferServiceImp implements TransferService {
     @Transactional
     public TransferDTO makeTransfer(TransferDTO transfer) throws TransferUnauthorizedException, WorkerNotFoundException {
         boolean valid = transfer.amount() % 10 == 0;
-        Worker sourceWorker = workerRepository.findById(transfer.source()).orElse(null);
+        Worker sourceWorker = workerRepository.findByDni(transfer.source());
         if (sourceWorker == null) throw new WorkerNotFoundException("The source worker is not valid");
-        Worker destinyWorker = workerRepository.findById(transfer.destiny()).orElse(null);
+        Worker destinyWorker = workerRepository.findByDni(transfer.destiny());
         if (destinyWorker == null) throw new WorkerNotFoundException("The destiny worker is not valid");
         if (sourceWorker.getName().equals(banned) || destinyWorker.getName().equals(banned))
-            throw new TransferUnauthorizedException("Antonio is not allowed in our system");
+            valid = false;
         double amount = transfer.amount();
         Transfer transferToDB = new Transfer(sourceWorker, destinyWorker, amount);
 
@@ -70,10 +70,10 @@ public class TransferServiceImp implements TransferService {
         return transferList.stream().filter(transfer -> !transfer.isValid()).map(TransferMapper.INSTANCE::mapToDTO).collect(Collectors.toList());
     }
     //endregion
-    
+
     //region PRIVATE_METHOD
     private void transfer(Worker sourceWorker, Worker destinyWorker, double amount, Transfer transfer) {
-       sourceWorker.getTransfersEmitted().add(transfer.getId());
+        sourceWorker.getTransfersEmitted().add(transfer.getId());
         destinyWorker.getTransfersReceived().add(transfer.getId());
         workerRepository.save(sourceWorker);
         workerRepository.save(destinyWorker);

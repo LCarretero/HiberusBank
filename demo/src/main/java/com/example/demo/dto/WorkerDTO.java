@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record WorkerDTO(String name, String lastName, double salary, double balance,
+public record WorkerDTO(String name, String lastName, String dni, double salary, double balance,
                         List<Long> transfersEmitted, List<Long> transfersReceived,
                         List<Long> payrolls) {
 
