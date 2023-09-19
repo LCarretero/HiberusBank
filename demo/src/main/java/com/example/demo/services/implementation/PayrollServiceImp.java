@@ -37,7 +37,7 @@ public class PayrollServiceImp implements PayrollService {
     public PayrollDTO pay(String id, String keyPass) throws HiberusBankException, WorkerNotFoundException {
         if (!KEYPASS.equals(keyPass)) throw new HiberusBankException();
         Worker worker = workerRepository.findByDni(id);
-        if (worker == null) throw new WorkerNotFoundException("The worker does not exist");
+        if (worker == null) throw new WorkerNotFoundException();
 
         double amountWithTaxes = worker.getSalary() - (worker.getSalary() * 0.0525);
         worker.setBalance(amountWithTaxes);

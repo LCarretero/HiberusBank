@@ -35,9 +35,9 @@ public class TransferServiceImp implements TransferService {
     public TransferDTO makeTransfer(TransferDTO transfer) throws TransferUnauthorizedException, WorkerNotFoundException {
         boolean valid = transfer.amount() % 10 == 0;
         Worker sourceWorker = workerRepository.findByDni(transfer.source());
-        if (sourceWorker == null) throw new WorkerNotFoundException("The source worker is not valid");
+        if (sourceWorker == null) throw new WorkerNotFoundException();
         Worker destinyWorker = workerRepository.findByDni(transfer.destiny());
-        if (destinyWorker == null) throw new WorkerNotFoundException("The destiny worker is not valid");
+        if (destinyWorker == null) throw new WorkerNotFoundException();
         if (sourceWorker.getName().equals(banned) || destinyWorker.getName().equals(banned))
             valid = false;
         double amount = transfer.amount();
