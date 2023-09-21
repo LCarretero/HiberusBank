@@ -5,6 +5,8 @@ import com.example.demo.entities.Payroll;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", imports = Payroll.class)
 public interface PayrollMapper {
     PayrollMapper INSTANCE = Mappers.getMapper(PayrollMapper.class);

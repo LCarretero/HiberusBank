@@ -47,11 +47,11 @@ class WorkerServiceTest {
 
         WorkerDTO result = workerService.saveWorker(workerTest);
 
-        assertEquals(workerTest.getDni(), result.dni());
-        assertEquals(workerTest.getName(), result.name());
-        assertEquals(workerTest.getLastName(), result.lastName());
-        assertEquals(workerTest.getSalary(), result.salary());
-        assertEquals(workerTest.getBalance(), result.balance());
+        assertEquals(workerTest.getDni(), result.getDni());
+        assertEquals(workerTest.getName(), result.getName());
+        assertEquals(workerTest.getLastName(), result.getLastName());
+        assertEquals(workerTest.getSalary(), result.getSalary());
+        assertEquals(workerTest.getBalance(), result.getBalance());
     }
 
     @Test
@@ -74,11 +74,11 @@ class WorkerServiceTest {
         //Then
         verify(workerRepository, times(1)).getReferenceById(workerTest.getId());
 
-        assertEquals("77991221V", result.dni());
-        assertEquals("Lisardo", result.name());
-        assertEquals("Carretero", result.lastName());
-        assertEquals(6000, result.salary());
-        assertEquals(0.0, result.balance());
+        assertEquals("77991221V", result.getDni());
+        assertEquals("Lisardo", result.getName());
+        assertEquals("Carretero", result.getLastName());
+        assertEquals(6000, result.getSalary());
+        assertEquals(0.0, result.getBalance());
     }
 }
 
