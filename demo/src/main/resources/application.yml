@@ -11,7 +11,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgresPlusDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
 
 keypass: Gandalf
 lore: É0wyn

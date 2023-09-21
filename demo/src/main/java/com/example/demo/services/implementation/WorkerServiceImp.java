@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -68,8 +67,7 @@ public class WorkerServiceImp implements WorkerService {
         if (fromDB == null) throw new WorkerNotFoundException();
         if (amount < 0) throw new TransferBadRequestException();
         fromDB.setSalary(fromDB.getSalary() + amount);
-        workerRepository.save(fromDB);
-        return workerToDTO(fromDB);
+        return workerToDTO(workerRepository.save(fromDB));
     }
 
     @Override
@@ -97,17 +95,17 @@ public class WorkerServiceImp implements WorkerService {
     }
 
     private WorkerDTO workerToDTO(Worker worker) {
-        List<TransferDTO> transferEmitted = worker.getTransfersEmitted() == null ? new ArrayList<>() : worker.getTransfersEmitted().stream()
+        List<TransferDTO> transferEmitted = worker.getTransfersEmitted() == null ? null : worker.getTransfersEmitted().stream()
                 .map(id -> transferRepository.findById(id)
                         .map(TransferMapper.INSTANCE::mapToDTO)
                         .orElse(null))
                 .toList();
-        List<TransferDTO> transferReceived = worker.getTransfersReceived() == null ? new ArrayList<>() : worker.getTransfersReceived().stream()
+        List<TransferDTO> transferReceived = worker.getTransfersReceived() == null ? null : worker.getTransfersReceived().stream()
                 .map(id -> transferRepository.findById(id)
                         .map(TransferMapper.INSTANCE::mapToDTO)
                         .orElse(null))
                 .toList();
-        List<PayrollDTO> payroll = worker.getPayrolls().stream() == null ? new ArrayList<>() : worker.getPayrolls().stream()
+        List<PayrollDTO> payroll = worker.getPayrolls() == null ? null : worker.getPayrolls().stream()
                 .map(id -> payrollRepository.findById(id)
                         .map(PayrollMapper.INSTANCE::mapToDTO)
                         .orElse(null))
