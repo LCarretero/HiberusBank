@@ -4,7 +4,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgresBank
+    url: jdbc:postgresql://localhost:5436/postgresBank
     username: hiberusBank
     password: Hiberus123
     driverClassName: org.postgresql.Driver
