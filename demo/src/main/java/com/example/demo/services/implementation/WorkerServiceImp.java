@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class WorkerServiceImp implements WorkerService {
@@ -95,20 +97,26 @@ public class WorkerServiceImp implements WorkerService {
     }
 
     private WorkerDTO workerToDTO(Worker worker) {
-        List<TransferDTO> transferEmitted = worker.getTransfersEmitted() == null ? null : worker.getTransfersEmitted().stream()
-                .map(id -> transferRepository.findById(id)
-                        .map(TransferMapper.INSTANCE::mapToDTO)
-                        .orElse(null))
+        List<TransferDTO> transferEmitted = worker.getTransfersEmitted() == null
+                ? new ArrayList<>()
+                : worker.getTransfersEmitted().stream()
+                .map(id -> transferRepository.findById(id).orElse(null))
+                .filter(Objects::nonNull)
+                .map(TransferMapper.INSTANCE::mapToDTO)
                 .toList();
-        List<TransferDTO> transferReceived = worker.getTransfersReceived() == null ? null : worker.getTransfersReceived().stream()
-                .map(id -> transferRepository.findById(id)
-                        .map(TransferMapper.INSTANCE::mapToDTO)
-                        .orElse(null))
+        List<TransferDTO> transferReceived = worker.getTransfersReceived() == null
+                ? new ArrayList<>()
+                : worker.getTransfersReceived().stream()
+                .map(id -> transferRepository.findById(id).orElse(null))
+                .filter(Objects::nonNull)
+                .map(TransferMapper.INSTANCE::mapToDTO)
                 .toList();
-        List<PayrollDTO> payroll = worker.getPayrolls() == null ? null : worker.getPayrolls().stream()
-                .map(id -> payrollRepository.findById(id)
-                        .map(PayrollMapper.INSTANCE::mapToDTO)
-                        .orElse(null))
+        List<PayrollDTO> payroll = worker.getPayrolls() == null
+                ? new ArrayList<>()
+                : worker.getPayrolls().stream()
+                .map(id -> payrollRepository.findById(id).orElse(null))
+                .filter(Objects::nonNull)
+                .map(PayrollMapper.INSTANCE::mapToDTO)
                 .toList();
         return new WorkerDTO(worker, transferEmitted, transferReceived, payroll);
     }
