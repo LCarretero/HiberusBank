@@ -11,8 +11,8 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgresPlusDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
 
 keypass: Gandalf
-lore: É0wyn
-banned: Antonio
+LORE: É0wyn
+BANNED: Antonio

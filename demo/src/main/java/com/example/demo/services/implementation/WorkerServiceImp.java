@@ -27,7 +27,7 @@ import java.util.Objects;
 @Service
 public class WorkerServiceImp implements WorkerService {
     //region PRIVATE_FIELDS
-    @Value(value = "${lore}")
+    @Value(value = "${LORE}")
     private String LORE;
     @Autowired
     private WorkerRepository workerRepository;
@@ -67,7 +67,7 @@ public class WorkerServiceImp implements WorkerService {
     public WorkerDTO riseSalary(String id, double amount) throws WorkerNotFoundException, TransferBadRequestException {
         Worker fromDB = getWorker(id);
         if (fromDB == null) throw new WorkerNotFoundException();
-        if (amount < 0) throw new TransferBadRequestException();
+        if (amount <= 0) throw new TransferBadRequestException();
         fromDB.setSalary(fromDB.getSalary() + amount);
         return workerToDTO(workerRepository.save(fromDB));
     }

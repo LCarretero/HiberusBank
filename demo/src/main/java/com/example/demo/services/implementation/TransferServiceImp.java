@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class TransferServiceImp implements TransferService {
     //region PRIVATE_FIELDS
-    @Value(value = "${banned}")
+    @Value(value = "${BANNED}")
     private String banned;
     @Autowired
     private TransferRepository transferRepository;
