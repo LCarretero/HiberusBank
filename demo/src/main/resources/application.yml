@@ -13,6 +13,6 @@ spring:
     hibernate:
       ddl-auto: create
 
-keypass: Gandalf
+KEYPASS: Gandalf
 LORE: É0wyn
 BANNED: Antonio

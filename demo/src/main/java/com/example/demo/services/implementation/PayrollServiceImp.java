@@ -23,7 +23,7 @@ public class PayrollServiceImp implements PayrollService {
     private WorkerRepository workerRepository;
     @Autowired
     private PayrollRepository payrollRepository;
-    @Value(value = "${keypass}")
+    @Value(value = "${KEYPASS}")
     private String KEYPASS;
 
     @Override
